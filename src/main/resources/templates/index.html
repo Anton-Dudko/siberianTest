@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/shards.min.css">
+    <script src="/path/to/htmx.min.js"></script></head>
+<body>
+<div th:switch="${tasks}" class="container my-7">
+    <div class="row">
+        <div class="col-md-auto">
+            <h2 th:case="null">No users yet!</h2>
+            <div th:case="*">
+                <br>
+                <form th:action="@{/}" method="get">
+                    <div class="form-row">
+                        <div class="col-md-4 mb-3">
+                            <label for="title">Title:</label>
+                            <input type="text" class="form-control" name="title" id="title" placeholder="Enter title" th:value="${param.title}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="description">Description:</label>
+                            <input type="text" class="form-control" name="description" id="description" placeholder="Enter description" th:value="${param.description}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-md-4 mb-3">
+                            <label for="fromDate">From Date:</label>
+                            <input type="date" id="fromDate" name="fromDate" class="form-control" th:value="${param.fromDate}" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="toDate">To Date:</label>
+                            <input type="date" id="toDate" name="toDate" class="form-control" th:value="${param.toDate}" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="custom-control custom-checkbox col-auto">
+                                <input type="checkbox" class="custom-control-input" name="completed" id="completed" th:checked="${param.completed}">
+                                <label class="custom-control-label" for="completed">Completed</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                    <br>
+                </form>
+                <table class="table table-striped table-responsive-md">
+                    <thead>
+                    <tr>
+                        <th><a th:href="@{'/?title=' + ${title} + '&description=' + ${description} +'&size=' + ${size} + '&page=' + ${taskPage} + '&sortField=id'}">ID</a></th>
+                        <th><a th:href="@{'/?title=' + ${title} + '&description=' + ${description} +'&size=' + ${size} + '&page=' + ${taskPage} + '&sortField=title'}">Title</a></th>
+                        <th><a th:href="@{'/?title=' + ${title} + '&description=' + ${description} +'&size=' + ${size} + '&page=' + ${taskPage} + '&sortField=description'}">Description</a></th>
+                        <th><a th:href="@{'/?title=' + ${title} + '&description=' + ${description} +'&size=' + ${size} + '&page=' + ${taskPage} + '&sortField=creationDate'}">Creation Date</a></th>
+                        <th><a th:href="@{'/?title=' + ${title} + '&description=' + ${description} +'&size=' + ${size} + '&page=' + ${taskPage} + '&sortField=modificationDate'}">Modification Date</a></th>
+                        <th><a th:href="@{'/?title=' + ${title} + '&description=' + ${description} +'&size=' + ${size} + '&page=' + ${taskPage} + '&sortField=isCompleted'}">Completed</a></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="task : ${tasks}">
+                        <td th:text="${task.id}"></td>
+                        <td th:text="${task.title}"></td>
+                        <td th:text="${task.description}"></td>
+                        <td th:text="${task.creationDate}"></td>
+                        <td th:text="${task.modificationDate}"></td>
+                        <td th:text="${task.isCompleted()}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div th:if="${taskPage.totalPages > 0}"
+                     th:each="pageNumber : ${pageNumbers}">
+                    <span><a th:href="@{/(size=${taskPage.size}, page=${pageNumber})}"
+                            th:text="${pageNumber}"
+                            th:class="${pageNumber==taskPage.number + 0} ? active" ></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:if = "${totalPages > 1}">
+        <div class = "row col-sm-10">
+            <div class = "col-sm-2">
+                Total Rows: [[${totalItems}]]
+            </div>
+            <div class = "col-sm-3">
+					<span th:each="i: ${#numbers.sequence(1, totalPages)}">
+						<a th:if="${taskPage != i}" th:href="@{'/?title=' + ${title} + '&description=' + ${description} + '&size=' + ${size} + '&page=' + ${i} + '&sortField=' + ${sortField}}">[[${i}]]</a>
+						<span th:unless="${taskPage != i}">[[${i}]]</span>  &nbsp;
+					</span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
